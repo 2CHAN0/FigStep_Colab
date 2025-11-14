@@ -93,6 +93,48 @@ Concatenate the 3 images. And generate steps to conduct the action in the concat
 Please import the code in `src/generate_prompts.py` to generate such text-screenshots.
  
 
+### 3.1 Local Ollama (Qwen3-VL) Pipeline
+Use `src/run_figstep_ollama.py` to automatically
+1. load a SafeBench sample (or a custom question/instruction pair),
+2. build the FigStep image + prompt, and
+3. query a locally running Ollama `qwen3-vl:2b` model.
+
+Example command (run from the project root while Ollama is serving on port `11434`):
+
+```bash
+python src/run_figstep_ollama.py \
+  --dataset data/question/SafeBench-Tiny.csv \
+  --task-id 1 \
+  --model qwen3-vl:2b \
+  --ollama-url http://localhost:11434 \
+  --output-dir artifacts
+```
+
+The script stores the generated prompt/image under `artifacts/` and prints the model response.  
+Install the required dependencies beforehand (e.g., `pip install pillow pandas requests tqdm`).
+If you do not have `FreeMonoBold.ttf` installed, set the environment variable `FIGSTEP_FONT` to any TTF file path (e.g., `export FIGSTEP_FONT=/path/to/DejaVuSans.ttf`).
+
+### 3.2 Hugging Face Transformers (No Server)
+If you prefer to run a multimodal model directly through Transformers (e.g., on Colab/GPU),
+use `src/run_figstep_hf.py`. It mirrors the Ollama workflow but loads a Hugging Face checkpoint,
+optionally with 4-bit weights. Example:
+
+```bash
+python src/run_figstep_hf.py \
+  --dataset data/question/SafeBench-Tiny.csv \
+  --task-id 1 \
+  --model-id Qwen/Qwen2-VL-2B-Instruct \
+  --torch-dtype float16 \
+  --device cuda \
+  --output-dir artifacts
+```
+
+Install `transformers`, `accelerate`, `torch`, `pillow`, `pandas`, `requests`, `tqdm`, and `bitsandbytes`
+(when using `--load-in-4bit`). The generated FigStep image/prompt are written under `artifacts/`
+and immediately fed into the loaded vision-language model. The script automatically constructs
+the required multimodal chat template (e.g., inserts `<image>` placeholders for Qwen models),
+so you can pass plain FigStep prompts without manual formatting.
+
 ## 4. Dataset
 We release `SafeBench`, a dataset of 500 questions on 10 topics that are forbidden by both OpenAI and Meta usage policies.
 Please see `data/question/safebench.csv` for more details.
@@ -152,6 +194,3 @@ Compared with FigStep, FigStep-Pro leverages additional post-processing: FigStep
 <div align="center">
 <img width="50%" alt="FigStep" src="assets/gpt4v-shot.png">
 </div>
-
-
-

@@ -1,0 +1,5 @@
+.venv/*
+.DS_Store
+artifacts
+src/run_figstep_ollama.py
+src/__pycache__/*

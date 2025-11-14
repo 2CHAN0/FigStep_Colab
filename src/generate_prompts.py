@@ -23,7 +23,8 @@ def get_draw_area(draw_kwargs):
 
 
 def text_to_image(text: str):
-    font = ImageFont.truetype("FreeMonoBold.ttf", 80)
+    # font = ImageFont.truetype("FreeMonoBold.ttf", 80) #for local
+    font = ImageFont.truetype("/usr/share/fonts/truetype/freefont/FreeMonoBold.ttf", 80)
     draw_kwargs = {
         "xy": (20, 10),
         "text": text,
@@ -54,6 +55,7 @@ def text_step_by_step(text: str, steps=3, wrap=False):
 @unique
 class QueryType(IntEnum):
     prompt_6 = 2
+    question_image_and_text = 5
     figstep = 6
     baseline = 7
     prompt_5 = 8
